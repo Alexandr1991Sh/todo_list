@@ -1,62 +1,78 @@
-import React, {useState} from 'react';
+import React, {ChangeEvent, useState} from 'react';
 import {BtnNameType, TaskType} from "../App";
+import {Button} from "./Button";
 
 
 type TodolistPropsType = {
     title: string
     tasks: TaskType[]
-    removeTask: (taskId: number) => void
-    // filterTasks: (btnName: BtnNameType)=>void
+    removeTask: (taskId: string) => void
+    changeFilter: (btnName: BtnNameType) => void
+    addTask: (task: string) => void
 }
 
-export const Todolist: React.FC<TodolistPropsType> = ({title, tasks, removeTask}) => {
+export const Todolist: React.FC<TodolistPropsType> = (
+    {title, tasks, changeFilter, removeTask, addTask}
+) => {
 
-    const [filteredTask, setFilteredTask] = useState<BtnNameType>('All')
+    const [value, setValue] = useState('')
 
-    const filterTasks = (btnName: BtnNameType) => {
-        setFilteredTask(btnName)
+    const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+        setValue(e.currentTarget.value)
     }
-    const boxForFilters=()=>{
-        let tasksForTodolist = tasks
-        if (filteredTask === 'Active') {
-            tasksForTodolist = tasks.filter(task => !task.isDone)
-        }
 
-        if (filteredTask === 'Completed') {
-            tasksForTodolist = tasks.filter(task => task.isDone)
-        }
-        return tasksForTodolist
+    const onclickAddTask = () => {
+        addTask(value)
+        setValue('')
     }
+
+    const onKeyPressHandler = (e: any) => {
+        if (e.key === 'Enter') {
+            addTask(value)
+            setValue('')
+        }
+    }
+
+    const onAllClickHandler = () => changeFilter('All')
+    const onActiveClickHandler = () => changeFilter('Active')
+    const onCompletedClickHandler = () => changeFilter('Completed')
+
+    const mappedTasks = tasks.length === 0 ? 'Your task list is empty'
+            : tasks.map(tasks => {
+
+                const onClickRemoveTaskHandler = () => removeTask(tasks.id)
+
+                return (
+                    <li key={tasks.id}>
+                        <input type="checkbox" checked={tasks.isDone}/>
+                        <span>{tasks.title}</span>
+                        <Button name={'x'} callBack={onClickRemoveTaskHandler}/>
+                    </li>
+                )
+            })
+
 
 
     return (
         <div>
             <h3>{title}</h3>
             <div>
-                <input/>
-                <button>+</button>
+                <input
+                    value={value}
+                    onChange={onChangeHandler}
+                    onKeyPress={onKeyPressHandler}
+                />
+                <Button name={'+'} callBack={onclickAddTask}/>
             </div>
 
             <ul>
-                {tasks.length === 0 ? 'Your task list is empty'
-                    : boxForFilters().map(tasks => {
-                        return (
-                            <li key={tasks.id}>
-                                <input type="checkbox" checked={tasks.isDone}/>
-                                <span>{tasks.title}</span>
-                                <button onClick={() => {
-                                    removeTask(tasks.id)
-                                }}>x
-                                </button>
-                            </li>
-                        )
-                    })}
+                {mappedTasks}
             </ul>
 
             <div>
-                <button onClick={()=>filterTasks('All')}>All</button>
-                <button onClick={()=>filterTasks('Active')}>Active</button>
-                <button onClick={()=>filterTasks('Completed')}>Completed</button>
+                <Button name={'All'} callBack={onAllClickHandler}/>
+                <Button name={'Active'} callBack={onActiveClickHandler}/>
+                <Button name={'Completed'} callBack={onCompletedClickHandler}/>
             </div>
 
         </div>
