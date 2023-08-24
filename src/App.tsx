@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import './App.css';
-import {Todolist} from "./Components/Todolist";
+import {Todolist} from "./Components/Todolist/Todolist";
 import {v1} from "uuid";
 
 export type TaskType = {
@@ -42,6 +42,10 @@ function App() {
         setTasks([newTask, ...tasks])
     }
 
+    const changeTaskStatus = (id: string, isDone: boolean) => {
+        setTasks(tasks.map(task => task.id === id ? {...task, isDone} : task))
+    }
+
 
     return (
         <div className="App">
@@ -52,6 +56,7 @@ function App() {
                 removeTask={removeTask}
                 changeFilter={changeFilter}
                 addTask={addTask}
+                changeTaskStatus={changeTaskStatus}
             />
 
         </div>
