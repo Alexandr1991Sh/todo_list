@@ -7,10 +7,13 @@ import s from './Todulist.module.css'
 type TodolistPropsType = {
     title: string
     tasks: TaskType[]
-    removeTask: (taskId: string) => void
-    changeFilter: (btnName: BtnNameType) => void
-    addTask: (task: string) => void
-    changeTaskStatus: (id: string, isDone: boolean) => void
+    removeTask: (todolistId: string, taskId: string) => void
+    changeFilter: (todolistId: string, btnName: BtnNameType) => void
+    addTask: (todolistId: string, task: string) => void
+    changeTaskStatus: (todolistId: string, taskId: string, isDone: boolean) => void
+    filter: BtnNameType
+    todolistId: string
+    removeTodolist: (todolistId: string) => void
 }
 
 export const Todolist: React.FC<TodolistPropsType> = (
@@ -20,7 +23,10 @@ export const Todolist: React.FC<TodolistPropsType> = (
         changeFilter,
         removeTask,
         addTask,
-        changeTaskStatus
+        changeTaskStatus,
+        filter,
+        todolistId,
+        removeTodolist
     }
 ) => {
 
@@ -34,7 +40,7 @@ export const Todolist: React.FC<TodolistPropsType> = (
 
     const onclickAddTask = () => {
         if (value.trim() !== '') {
-            addTask(value)
+            addTask(todolistId, value)
             setValue('')
         } else {
             setError('Title is required')
@@ -45,7 +51,7 @@ export const Todolist: React.FC<TodolistPropsType> = (
         setError(null)
         if (e.key === 'Enter') {
             if (value.trim() !== '') {
-                addTask(value)
+                addTask(todolistId, value)
                 setValue('')
             } else {
                 setError('Title is required')
@@ -53,19 +59,22 @@ export const Todolist: React.FC<TodolistPropsType> = (
         }
     }
 
+    const onClickRemoveTodolistHandler = () => removeTodolist(todolistId)
+
+
     const [btnName, setBtnName] = useState<BtnNameType>('All')
-    const onClickChangeBtnName = (value: BtnNameType) => {
-        changeFilter(value)
-        setBtnName(value)
+    const onClickChangeBtnName = (todolistId: string, btnName: BtnNameType) => {
+        changeFilter(todolistId, btnName)
+        setBtnName(btnName)
     }
 
     const mappedTasks = tasks.length === 0 ? 'Your task list is empty'
         : tasks.map(tasks => {
 
-            const onClickRemoveTaskHandler = () => removeTask(tasks.id)
+            const onClickRemoveTaskHandler = () => removeTask(todolistId, tasks.id)
 
             const onChangeIsDoneHandler = (e: ChangeEvent<HTMLInputElement>) => {
-                changeTaskStatus(tasks.id, e.currentTarget.checked)
+                changeTaskStatus(todolistId, tasks.id, e.currentTarget.checked)
             }
 
             return (
@@ -85,7 +94,9 @@ export const Todolist: React.FC<TodolistPropsType> = (
 
     return (
         <div>
+            <Button name={'x'} callBack={onClickRemoveTodolistHandler}/>
             <h3>{title}</h3>
+
             <div>
                 <input
                     value={value}
@@ -103,11 +114,11 @@ export const Todolist: React.FC<TodolistPropsType> = (
 
             <div>
                 <Button myClass={btnName === 'All' ? s.activeFilter : ''} name={'All'}
-                        callBack={() => onClickChangeBtnName('All')}/>
+                        callBack={() => onClickChangeBtnName(todolistId, 'All')}/>
                 <Button myClass={btnName === 'Active' ? s.activeFilter : ''} name={'Active'}
-                        callBack={() => onClickChangeBtnName('Active')}/>
+                        callBack={() => onClickChangeBtnName(todolistId, 'Active')}/>
                 <Button myClass={btnName === 'Completed' ? s.activeFilter : ''} name={'Completed'}
-                        callBack={() => onClickChangeBtnName('Completed')}/>
+                        callBack={() => onClickChangeBtnName(todolistId, 'Completed')}/>
             </div>
 
         </div>
