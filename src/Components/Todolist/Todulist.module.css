@@ -13,3 +13,16 @@
 .isDone {
     opacity: 0.5;
 }
+
+.titleAndBtn {
+    display: flex;
+    align-items: center;
+}
+
+.title {
+    flex-grow: 1;
+}
+
+.btn {
+    margin-left: 10px;
+}

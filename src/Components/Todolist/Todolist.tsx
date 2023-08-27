@@ -2,6 +2,8 @@ import React, {ChangeEvent, useState} from 'react';
 import {BtnNameType, TaskType} from "../../App";
 import {Button} from "../Button";
 import s from './Todulist.module.css'
+import {AddItemForm} from "../AddItemForm/AddItemForm";
+import {EditableSpan} from "../EditableSpan/EditableSpan";
 
 
 type TodolistPropsType = {
@@ -24,40 +26,12 @@ export const Todolist: React.FC<TodolistPropsType> = (
         removeTask,
         addTask,
         changeTaskStatus,
-        filter,
         todolistId,
         removeTodolist
     }
 ) => {
 
-    const [value, setValue] = useState('')
-    const [error, setError] = useState<string | null>(null)
 
-
-    const onChangeInputHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        setValue(e.currentTarget.value)
-    }
-
-    const onclickAddTask = () => {
-        if (value.trim() !== '') {
-            addTask(todolistId, value)
-            setValue('')
-        } else {
-            setError('Title is required')
-        }
-    }
-
-    const onKeyPressHandler = (e: any) => {
-        setError(null)
-        if (e.key === 'Enter') {
-            if (value.trim() !== '') {
-                addTask(todolistId, value)
-                setValue('')
-            } else {
-                setError('Title is required')
-            }
-        }
-    }
 
     const onClickRemoveTodolistHandler = () => removeTodolist(todolistId)
 
@@ -69,6 +43,7 @@ export const Todolist: React.FC<TodolistPropsType> = (
     }
 
     const mappedTasks = tasks.length === 0 ? 'Your task list is empty'
+
         : tasks.map(tasks => {
 
             const onClickRemoveTaskHandler = () => removeTask(todolistId, tasks.id)
@@ -78,34 +53,38 @@ export const Todolist: React.FC<TodolistPropsType> = (
             }
 
             return (
-                <li key={tasks.id} className={tasks.isDone ? s.isDone : ''}>
-                    <input
-                        type="checkbox"
-                        checked={tasks.isDone}
-                        onChange={onChangeIsDoneHandler}
-                    />
-
-                    <span>{tasks.title}</span>
-                    <Button name={'x'} callBack={onClickRemoveTaskHandler}/>
-                </li>
+                <div className={s.titleAndBtn}>
+                    <li key={tasks.id} className={tasks.isDone ? s.isDone : ''} style={{ display: "flex", alignItems: "center" }}>
+                        <input
+                            type="checkbox"
+                            checked={tasks.isDone}
+                            onChange={onChangeIsDoneHandler}
+                        />
+                        <div className={s.title}>
+                            <EditableSpan oldTitle={tasks.title} />
+                        </div>
+                        <div className={s.btn}>
+                            <Button name={'x'} callBack={onClickRemoveTaskHandler} />
+                        </div>
+                    </li>
+                </div>
             )
         })
+
+    const addTaskHandler = (title: string) => {
+        addTask(todolistId, title)
+    }
 
 
     return (
         <div>
-            <Button name={'x'} callBack={onClickRemoveTodolistHandler}/>
-            <h3>{title}</h3>
+            <div className={s.titleAndBtn}>
+                <h3>{title}</h3>
+                <Button name={'x'} callBack={onClickRemoveTodolistHandler}/>
+            </div>
 
             <div>
-                <input
-                    value={value}
-                    onChange={onChangeInputHandler}
-                    onKeyPress={onKeyPressHandler}
-                    className={error ? s.error : ''}
-                />
-                <Button name={'+'} callBack={onclickAddTask}/>
-                {error && <div className={s.errorMessage}>{error}</div>}
+                <AddItemForm callback={addTaskHandler}/>
             </div>
 
             <ul>
