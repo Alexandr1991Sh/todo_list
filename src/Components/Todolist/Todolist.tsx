@@ -16,6 +16,8 @@ type TodolistPropsType = {
     filter: BtnNameType
     todolistId: string
     removeTodolist: (todolistId: string) => void
+    updateTask: (todolistId: string, taskId: string, updateTitle: string) => void
+    updateTitleTodolist: (todolistId: string, updateTitle: string)=>void
 }
 
 export const Todolist: React.FC<TodolistPropsType> = (
@@ -27,19 +29,22 @@ export const Todolist: React.FC<TodolistPropsType> = (
         addTask,
         changeTaskStatus,
         todolistId,
-        removeTodolist
+        removeTodolist,
+        updateTask,
+        updateTitleTodolist
     }
 ) => {
 
-
-
     const onClickRemoveTodolistHandler = () => removeTodolist(todolistId)
-
 
     const [btnName, setBtnName] = useState<BtnNameType>('All')
     const onClickChangeBtnName = (todolistId: string, btnName: BtnNameType) => {
         changeFilter(todolistId, btnName)
         setBtnName(btnName)
+    }
+
+    const callBackUpdateTitleTodolist = (updateTitle:string) => {
+        updateTitleTodolist(todolistId,updateTitle)
     }
 
     const mappedTasks = tasks.length === 0 ? 'Your task list is empty'
@@ -52,19 +57,25 @@ export const Todolist: React.FC<TodolistPropsType> = (
                 changeTaskStatus(todolistId, tasks.id, e.currentTarget.checked)
             }
 
+            const callBackUpdateTask = (updateTitle:string) => {
+                updateTask(todolistId,tasks.id,updateTitle)
+            }
+
+
             return (
                 <div className={s.titleAndBtn}>
-                    <li key={tasks.id} className={tasks.isDone ? s.isDone : ''} style={{ display: "flex", alignItems: "center" }}>
+                    <li key={tasks.id} className={tasks.isDone ? s.isDone : ''}
+                        style={{display: "flex", alignItems: "center"}}>
                         <input
                             type="checkbox"
                             checked={tasks.isDone}
                             onChange={onChangeIsDoneHandler}
                         />
                         <div className={s.title}>
-                            <EditableSpan oldTitle={tasks.title} />
+                            <EditableSpan callback={callBackUpdateTask} oldTitle={tasks.title}/>
                         </div>
                         <div className={s.btn}>
-                            <Button name={'x'} callBack={onClickRemoveTaskHandler} />
+                            <Button name={'x'} callBack={onClickRemoveTaskHandler}/>
                         </div>
                     </li>
                 </div>
@@ -79,7 +90,8 @@ export const Todolist: React.FC<TodolistPropsType> = (
     return (
         <div>
             <div className={s.titleAndBtn}>
-                <h3>{title}</h3>
+                {/*<h3>{title}</h3>*/}
+                <EditableSpan oldTitle={title} callback={callBackUpdateTitleTodolist}/>
                 <Button name={'x'} callBack={onClickRemoveTodolistHandler}/>
             </div>
 
