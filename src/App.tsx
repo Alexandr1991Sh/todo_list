@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useReducer, useState} from 'react';
 import './App.css';
 import {TaskType, Todolist} from './Todolist';
 import {v1} from 'uuid';
@@ -6,6 +6,13 @@ import {AddItemForm} from './AddItemForm';
 import AppBar from '@mui/material/AppBar/AppBar';
 import {Button, Container, Grid, IconButton, Paper, Toolbar, Typography} from "@mui/material";
 import {Menu} from "@mui/icons-material";
+import {
+    addTodolistAc,
+    changeTodolistFilterAc,
+    changeTodolistTitleAc,
+    removeTodolistAc,
+    todolistsReducer
+} from "./state/Reducer/todolistsReducer/todolist-reducer";
 
 
 export type FilterValuesType = "all" | "active" | "completed";
@@ -15,7 +22,7 @@ export type TodolistType = {
     filter: FilterValuesType
 }
 
-type TasksStateType = {
+export type TasksStateType = {
     [key: string]: Array<TaskType>
 }
 
@@ -24,7 +31,7 @@ function App() {
     let todolistId1 = v1();
     let todolistId2 = v1();
 
-    let [todolists, setTodolists] = useState<Array<TodolistType>>([
+    let [todolists, dispatchTodolists] = useReducer(todolistsReducer,[
         {id: todolistId1, title: "What to learn", filter: "all"},
         {id: todolistId2, title: "What to buy", filter: "all"}
     ])
@@ -90,13 +97,15 @@ function App() {
         let todolist = todolists.find(tl => tl.id === todolistId);
         if (todolist) {
             todolist.filter = value;
-            setTodolists([...todolists])
+            // setTodolists([...todolists])
+            dispatchTodolists(changeTodolistFilterAc(todolistId, value))
         }
     }
 
     function removeTodolist(id: string) {
         // засунем в стейт список тудулистов, id которых не равны тому, который нужно выкинуть
-        setTodolists(todolists.filter(tl => tl.id != id));
+        // setTodolists(todolists.filter(tl => tl.id != id));
+        dispatchTodolists(removeTodolistAc(id))
         // удалим таски для этого тудулиста из второго стейта, где мы храним отдельно таски
         delete tasks[id]; // удаляем св-во из объекта... значением которого являлся массив тасок
         // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
@@ -109,14 +118,16 @@ function App() {
         if (todolist) {
             // если нашёлся - изменим ему заголовок
             todolist.title = title;
-            setTodolists([...todolists]);
+            // setTodolists([...todolists]);
+            dispatchTodolists(changeTodolistTitleAc(id,title))
         }
     }
 
-    function addTodolist(title: string) {
+    function addTodolist(title: string ) {
         let newTodolistId = v1();
         let newTodolist: TodolistType = {id: newTodolistId, title: title, filter: 'all'};
-        setTodolists([newTodolist, ...todolists]);
+        // setTodolists([newTodolist, ...todolists]);
+        dispatchTodolists(addTodolistAc(title,newTodolistId))
         setTasks({
             ...tasks,
             [newTodolistId]: []
