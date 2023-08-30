@@ -34,12 +34,30 @@ export const tasksReducer = (state: TasksStateType, action: TasksReducerType): T
                 } : el)
             }
         }
+        case "ADD-TODOLIST": {
+            // let newTodolistId = v1();
+            return {
+                ...state,
+                [action.payload.newTodolistId]: []
+            }
+        }
+        case "REMOVE-TODOLIST": {
+            const stateCopy = {...state}
+                delete stateCopy[action.payload.id]
+            return stateCopy
+        }
         default:
             return state
     }
 }
 
-type TasksReducerType = ChangeTaskStatusAC | RemoveTaskAC | AddTaskAC | ChangeTaskTitleAC
+type TasksReducerType =
+    ChangeTaskStatusAC
+    | RemoveTaskAC
+    | AddTaskAC
+    | ChangeTaskTitleAC
+    | AddTodolistAC
+    | RemoveTodolistAC
 
 type ChangeTaskStatusAC = ReturnType<typeof changeTaskStatusAC>
 export const changeTaskStatusAC = (id: string, isDone: boolean, todolistId: string) => {
@@ -70,6 +88,22 @@ export const changeTaskTitleAC = (id: string, newTitle: string, todolistId: stri
     return {
         type: 'CHANGE-TASK-TITLE',
         payload: {id, newTitle, todolistId}
+    } as const
+}
+
+type AddTodolistAC = ReturnType<typeof addTodolistAC>
+export const addTodolistAC = (title: string, newTodolistId: string) => {
+    return {
+        type: 'ADD-TODOLIST',
+        payload: {title, newTodolistId}
+    } as const
+}
+
+type RemoveTodolistAC = ReturnType<typeof removeTodolistAC>
+export const removeTodolistAC = (id: string) => {
+    return {
+        type: 'REMOVE-TODOLIST',
+        payload: {id}
     } as const
 }
 

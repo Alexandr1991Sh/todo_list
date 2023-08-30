@@ -13,6 +13,13 @@ import {
     removeTodolistAc,
     todolistsReducer
 } from "./state/Reducer/todolistsReducer/todolist-reducer";
+import {
+    addTaskAC, addTodolistAC,
+    changeTaskStatusAC,
+    changeTaskTitleAC,
+    removeTaskAC, removeTodolistAC,
+    tasksReducer
+} from "./state/Reducer/tasksReducer/tasks-reducer";
 
 
 export type FilterValuesType = "all" | "active" | "completed";
@@ -31,12 +38,22 @@ function App() {
     let todolistId1 = v1();
     let todolistId2 = v1();
 
-    let [todolists, dispatchTodolists] = useReducer(todolistsReducer,[
+    let [todolists, dispatchTodolists] = useReducer(todolistsReducer, [
         {id: todolistId1, title: "What to learn", filter: "all"},
         {id: todolistId2, title: "What to buy", filter: "all"}
     ])
 
-    let [tasks, setTasks] = useState<TasksStateType>({
+    // let [tasks, setTasks] = useState<TasksStateType>({
+    //     [todolistId1]: [
+    //         {id: v1(), title: "HTML&CSS", isDone: true},
+    //         {id: v1(), title: "JS", isDone: true}
+    //     ],
+    //     [todolistId2]: [
+    //         {id: v1(), title: "Milk", isDone: true},
+    //         {id: v1(), title: "React Book", isDone: true}
+    //     ]
+    // });
+    let [tasks, dispatchTasks] = useReducer(tasksReducer, {
         [todolistId1]: [
             {id: v1(), title: "HTML&CSS", isDone: true},
             {id: v1(), title: "JS", isDone: true}
@@ -54,20 +71,22 @@ function App() {
         // перезапишем в этом объекте массив для нужного тудулиста отфилтрованным массивом:
         tasks[todolistId] = todolistTasks.filter(t => t.id != id);
         // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
-        setTasks({...tasks});
+        // setTasks({...tasks});
+        dispatchTasks(removeTaskAC(id, todolistId))
     }
 
     function addTask(title: string, todolistId: string) {
-        let task = {id: v1(), title: title, isDone: false};
-        //достанем нужный массив по todolistId:
-        let todolistTasks = tasks[todolistId];
-        // перезапишем в этом объекте массив для нужного тудулиста копией, добавив в начало новую таску:
-        tasks[todolistId] = [task, ...todolistTasks];
+        // let task = {id: v1(), title: title, isDone: false};
+        // //достанем нужный массив по todolistId:
+        // let todolistTasks = tasks[todolistId];
+        // // перезапишем в этом объекте массив для нужного тудулиста копией, добавив в начало новую таску:
+        // tasks[todolistId] = [task, ...todolistTasks];
         // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
-        setTasks({...tasks});
+        // setTasks({...tasks});
+        dispatchTasks(addTaskAC(title, todolistId))
     }
 
-    function changeStatus(id: string, isDone: boolean, todolistId: string) {
+    function changeTaskStatus(id: string, isDone: boolean, todolistId: string) {
         //достанем нужный массив по todolistId:
         let todolistTasks = tasks[todolistId];
         // найдём нужную таску:
@@ -76,7 +95,8 @@ function App() {
         if (task) {
             task.isDone = isDone;
             // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
-            setTasks({...tasks});
+            // setTasks({...tasks});
+            dispatchTasks(changeTaskStatusAC(id, isDone, todolistId))
         }
     }
 
@@ -89,7 +109,8 @@ function App() {
         if (task) {
             task.title = newTitle;
             // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
-            setTasks({...tasks});
+            // setTasks({...tasks});
+            dispatchTasks(changeTaskTitleAC(id, newTitle, todolistId))
         }
     }
 
@@ -107,9 +128,10 @@ function App() {
         // setTodolists(todolists.filter(tl => tl.id != id));
         dispatchTodolists(removeTodolistAc(id))
         // удалим таски для этого тудулиста из второго стейта, где мы храним отдельно таски
-        delete tasks[id]; // удаляем св-во из объекта... значением которого являлся массив тасок
+        // delete tasks[id]; // удаляем св-во из объекта... значением которого являлся массив тасок
         // засетаем в стейт копию объекта, чтобы React отреагировал перерисовкой
-        setTasks({...tasks});
+        // setTasks({...tasks});
+        dispatchTasks(removeTodolistAC(id))
     }
 
     function changeTodolistTitle(id: string, title: string) {
@@ -119,19 +141,17 @@ function App() {
             // если нашёлся - изменим ему заголовок
             todolist.title = title;
             // setTodolists([...todolists]);
-            dispatchTodolists(changeTodolistTitleAc(id,title))
+            dispatchTodolists(changeTodolistTitleAc(id, title))
         }
     }
 
-    function addTodolist(title: string ) {
+    function addTodolist(title: string) {
         let newTodolistId = v1();
-        let newTodolist: TodolistType = {id: newTodolistId, title: title, filter: 'all'};
+        // let newTodolist: TodolistType = {id: newTodolistId, title: title, filter: 'all'};
         // setTodolists([newTodolist, ...todolists]);
-        dispatchTodolists(addTodolistAc(title,newTodolistId))
-        setTasks({
-            ...tasks,
-            [newTodolistId]: []
-        })
+        dispatchTodolists(addTodolistAc(title, newTodolistId))
+        // setTasks({...tasks, [newTodolistId]: []})
+        dispatchTasks(addTodolistAC(title, newTodolistId))
     }
 
     return (
@@ -139,7 +159,7 @@ function App() {
             <AppBar position="static">
                 <Toolbar>
                     <IconButton edge="start" color="inherit" aria-label="menu">
-                        <Menu />
+                        <Menu/>
                     </IconButton>
                     <Typography variant="h6">
                         News
@@ -174,7 +194,7 @@ function App() {
                                         removeTask={removeTask}
                                         changeTodolistFilter={changeTodolistFilter}
                                         addTask={addTask}
-                                        changeTaskStatus={changeStatus}
+                                        changeTaskStatus={changeTaskStatus}
                                         filter={tl.filter}
                                         removeTodolist={removeTodolist}
                                         changeTaskTitle={changeTaskTitle}
