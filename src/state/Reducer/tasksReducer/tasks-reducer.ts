@@ -1,7 +1,9 @@
 import {TasksStateType} from "../../../App";
 import {v1} from "uuid";
 
-export const tasksReducer = (state: TasksStateType, action: TasksReducerType): TasksStateType => {
+let initialState: TasksStateType = {}
+
+export const tasksReducer = (state: TasksStateType = initialState, action: TasksReducerType): TasksStateType => {
     switch (action.type) {
         case 'CHANGE-TASKS-STATUS': {
             return {
@@ -35,7 +37,6 @@ export const tasksReducer = (state: TasksStateType, action: TasksReducerType): T
             }
         }
         case "ADD-TODOLIST": {
-            // let newTodolistId = v1();
             return {
                 ...state,
                 [action.payload.newTodolistId]: []
