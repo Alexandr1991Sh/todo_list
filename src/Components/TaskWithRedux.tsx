@@ -15,7 +15,7 @@ export const TaskWithRedux = memo((
     {task, todolistId}: TaskWithReduxPropsType) => {
 
     const t = useSelector<AppRootStateType, TaskType>(state => state.tasks[todolistId]
-        .find(t => t.id === task.id) as TaskType)
+        .find(t => t.id === task.id) as  TaskType)
 
     const dispatch = useDispatch()
 
