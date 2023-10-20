@@ -1,21 +1,20 @@
 import React, {ChangeEvent} from 'react';
-import {FilterValuesType} from './App';
 import {AddItemForm} from './AddItemForm';
 import {EditableSpan} from './EditableSpan';
 import IconButton from '@mui/material/IconButton/IconButton';
 import {Delete} from "@mui/icons-material";
 import {Button, Checkbox} from "@mui/material";
-import {SuperCheckBox} from "./Components/SuperCheckBox";
+import {SuperCheckBox} from "./SuperCheckBox";
 import {TodolistType} from "./AppWithRedux";
 import {useDispatch, useSelector} from "react-redux";
-import {AppRootStateType} from "./state/store";
+import {AppRootStateType} from "../state/store";
 import {
     addTaskAC,
     changeTaskStatusAC, changeTaskTitleAC,
     removeTaskAC,
     removeTodolistAC
-} from "./state/Reducer/tasksReducer/tasks-reducer";
-import {changeTodolistFilterAc, changeTodolistTitleAc} from "./state/Reducer/todolistsReducer/todolist-reducer";
+} from "../state/Reducer/tasksReducer/tasks-reducer";
+import {changeTodolistFilterAc, changeTodolistTitleAc} from "../state/Reducer/todolistsReducer/todolist-reducer";
 
 
 export type TaskType = {
